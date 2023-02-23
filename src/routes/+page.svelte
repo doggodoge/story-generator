@@ -2,33 +2,34 @@
 	import Message from '../lib/components/Message.svelte';
 	import Prompt from '../lib/components/Prompt.svelte';
 
+	let username = 'Person Number 1';
 	let currentMessage = '';
 	let messages = [];
 
-	/** @type {string | undefined} */
-	let selected;
-
 	async function addNewMessage() {
-		messages = [...messages, { username: 'Person', message: currentMessage, isCurrentUser: true }];
+		messages = [...messages, { username, message: currentMessage, isCurrentUser: true }];
 		const response = await fetch('/api/gpt', {
 			method: 'POST',
-			body: currentMessage,
+			body: `[${username}]: ${currentMessage}`,
 			headers: {
 				'Content-Type': 'text/plain'
 			}
 		});
 		const generatedResponse = await response.text();
+		console.log(generatedResponse);
 		messages = [...messages, { username: 'AI', message: generatedResponse, isCurrentUser: false }];
 	}
 </script>
 
-<main class="flex flex-col h-full gap-3 overflow-visible">
-	<div class="flex flex-col flex-1 w-full gap-2 overflow-y-scroll">
+<main class="flex flex-col h-full max-h-full gap-3 overflow-auto">
+	<div class="flex flex-col flex-1 gap-2 px-2 overflow-y-auto">
 		{#each messages as message}
 			<Message username={message.username} isCurrentUser={message.isCurrentUser}>
-				{message.message}
+				<p slot="content">{message.message}</p>
 			</Message>
 		{/each}
 	</div>
-	<Prompt bind:value={currentMessage} bind:selected on:click={addNewMessage} />
+	<div class="p-1">
+		<Prompt bind:value={currentMessage} bind:username on:click={addNewMessage} />
+	</div>
 </main>
