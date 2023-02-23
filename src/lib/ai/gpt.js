@@ -1,26 +1,22 @@
-import { Configuration, OpenAIApi } from 'openai';
+import { browser } from '$app/environment';
 
-const configuration = new Configuration({
-	apiKey: import.meta.env.VITE_OPENAI_API_KEY
-});
-const openai = new OpenAIApi(configuration);
+const apiKey = browser ? localStorage.getItem('api_key') : '';
 
-/** @type {import('./$types').RequestHandler} */
-export async function POST({ request }) {
-	const prompt = await request.text();
-
-	const completion = await openai.createCompletion({
-		model: 'text-davinci-002',
-		prompt: addPreamble(prompt),
-		max_tokens: 2000
-	});
-
-	return new Response(completion.data.choices[0].text, {
-		status: 200,
+export async function getCompletion(prompt) {
+	const result = await fetch('https://api.openai.com/v1/completions', {
+        method: 'POST',
+		body: JSON.stringify({
+			model: 'text-davinci-002',
+			prompt: addPreamble(prompt),
+			max_tokens: 2000
+		}),
 		headers: {
-			'Content-Type': 'text/plain'
+			'Content-Type': 'application/json',
+			Authorization: `Bearer ${apiKey}`
 		}
 	});
+	const completion = await result.json();
+	return completion.choices[0].text;
 }
 
 function addPreamble(prompt) {
