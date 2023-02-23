@@ -11,9 +11,9 @@
 	export let maxLength = 2000;
 </script>
 
-<div class="flex flex-col relative">
+<div class="flex flex-col flex-1 relative h-full">
 	<textarea
-		class="px-3 w-full max-h-36 rounded-sm shadow focus:shadow-md outline-none transition resize-none {numberOfTokens >
+		class="flex h-full px-3 rounded-sm shadow focus:shadow-md outline-none transition resize-none {numberOfTokens >
 		maxLength
 			? 'shadow-red-600'
 			: ''}"
