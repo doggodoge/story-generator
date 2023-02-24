@@ -15,7 +15,7 @@
 
 <div class="flex flex-row gap-2 items-end z-10">
 	<div class="flex flex-col w-full gap-2">
-		<div class="pl-2"><EditableText bind:value={username} /></div>
+		<div class="pl-2 font-bold"><EditableText bind:value={username} /></div>
 		<div class="flex flex-col sm:flex-row w-full gap-2">
 			<Choice {choices} bind:selection={type} />
 			<div class="flex flex-row gap-2 w-full">
