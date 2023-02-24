@@ -2,12 +2,18 @@
 	import Message from '$lib/components/Message/Message.svelte';
 	import Prompt from '$lib/components/Prompt.svelte';
 	import { parse } from '$lib/lexers/storyLexer.js';
-	import {getCompletion} from "$lib/ai/gpt.js";
+	import { getCompletion } from '$lib/ai/gpt.js';
+
+	/** @typedef {import('$lib/types/types').Message} Message */
 
 	let username = 'Person Number 1';
 	let currentMessage = '';
+	/** @type {Message[]}  */
 	let messages = [];
+	/** @type {'dialog' | 'action'} */
 	let type = 'dialog';
+	/** @type {string} */
+	let context = '';
 
 	function generatePrompt() {
 		if (type === 'dialog') {
@@ -18,9 +24,12 @@
 
 	async function addNewMessage() {
 		messages = [...messages, { username, message: currentMessage, isCurrentUser: true, type }];
-		const generatedResponse = await getCompletion(generatePrompt());
+		const generatedResponse = await getCompletion(generatePrompt(), context);
 		const parsedStory = parse(generatedResponse);
 		console.log(parsedStory);
+
+		/** @type {Message[]} */
+		// @ts-ignore
 		const newMessages = parsedStory
 			.map((token, index) => {
 				if (token.type === 'character') {
@@ -38,6 +47,9 @@
 						isCurrentUser: false,
 						type: 'action'
 					};
+				}
+				if (token.type === 'context') {
+					context += ` ${token.value}`;
 				}
 				return null;
 			})
